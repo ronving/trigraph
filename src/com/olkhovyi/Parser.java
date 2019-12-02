@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -13,7 +15,8 @@ public class Parser {
         System.out.println("\t\t\t TRIGRAPH\n");
         String content = getText();
         List<String> trigraphs = parse(content);
-
+        Map<String, Long> sortedTrigraphs = getNumberOfRepetitions(trigraphs);
+        sortByValue(sortedTrigraphs);
     }
 
     private static String getText() {
@@ -28,7 +31,7 @@ public class Parser {
     }
 
     private static List<String> parse(String content) {
-        String[] words = content.split("\\s*(\\s|,|!|\\.)\\s*");
+        String[] words = content.toUpperCase().split("\\s*(\\s|,|!|\\.)\\s*");
 
         List<String> trigraphs = Arrays.stream(words)
                 .filter(s -> s.length() > 2)
@@ -44,6 +47,18 @@ public class Parser {
         for (int i = 0; i < count; i++) {
             trigraphs[i] = s.substring(i, i+3);
         }
+        return trigraphs;
+    }
+
+    private static Map<String, Long> getNumberOfRepetitions(List<String> trigraphs) {
+        Map<String, Long> uniqTrigraphs = trigraphs.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        return uniqTrigraphs;
+    }
+
+    private static Map<String, Long> sortByValue(Map<String, Long> trigraphs) {
+        trigraphs.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()).forEach(System.out::println);
         return trigraphs;
     }
 }
